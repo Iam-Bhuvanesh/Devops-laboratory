@@ -26,16 +26,12 @@ pipeline {
             }
         }
 
-        stage('Deploy with Docker') {
+        stage('Deploy with Ansible') {
             steps {
                 echo "=========================================="
-                echo "STAGE 3: Deploying Game Rental Container"
+                echo "STAGE 3: Deploying Container via Ansible"
                 echo "=========================================="
-                bat """
-                    "%DOCKER_BIN%" volume create game_rental_data
-                    "%DOCKER_BIN%" rm -f game-rental-app 2>nul
-                    "%DOCKER_BIN%" run -d --name game-rental-app -p 5002:5000 -v game_rental_data:/app/data ${IMAGE_NAME}
-                """
+                bat 'wsl bash -lc "cd /mnt/d/Devops-proj && ansible-playbook -i inventory.ini game-deploy.yml"'
             }
         }
     }
