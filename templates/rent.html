@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Rent a Game &bull; Game Rental Tracking System{% endblock %}
+
+{% block content %}
+<div class="subhead animate-enter">
+    <div>
+        <h1 class="subhead-heading">Rent a Game</h1>
+        <p class="subhead-description">Create a new customer rental request. A unique tracking ID will be generated upon submission.</p>
+    </div>
+</div>
+
+<div class="magic-bento animate-enter delay-1" style="grid-template-columns: 2fr 1fr; gap: 16px; max-width: 960px; margin: 0 auto;">
+    <!-- Main Cell: Rental Request Form -->
+    <div class="magic-bento__cell">
+        <div class="magic-bento__card">
+            <span class="magic-bento__light"></span>
+            <div class="magic-bento__content" style="padding: 24px;">
+                <div class="magic-bento__header" style="justify-content: space-between; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="magic-bento__icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="12" y1="18" x2="12" y2="12"></line>
+                                <line x1="9" y1="15" x2="15" y2="15"></line>
+                            </svg>
+                        </span>
+                        <span class="magic-bento__label" style="font-weight: 600; font-size: 13px; color: var(--color-fg-default);">Rental Request Form</span>
+                    </div>
+                    <span class="tag-pill">Step 1 of 2</span>
+                </div>
+
+                <form action="{{ url_for('submit_rental') }}" method="POST" id="rental-form">
+                    <div class="form-group">
+                        <label for="customer_name">Customer Name / Full Name *</label>
+                        <input type="text" id="customer_name" name="customer_name" class="form-control" placeholder="e.g. Alex Johnson" required>
+                        <div class="form-note">Enter your full legal name for verification.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contact">Email Address / Phone *</label>
+                        <input type="text" id="contact" name="contact" class="form-control" placeholder="e.g. alex@example.com" required>
+                        <div class="form-note">Used for order status notifications and dispatch tracking.</div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="game_title">Game Title *</label>
+                            <select id="game_title" name="game_title" class="form-control" required>
+                                <option value="">-- Select Game --</option>
+                                {% for game in available_games %}
+                                    <option value="{{ game.title }}" data-platform="{{ game.platform }}" {% if selected_game == game.title %}selected{% endif %}>
+                                        {{ game.title }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="platform">Platform *</label>
+                            <div class="rubber-segment" id="rent-platform-segment" role="radiogroup" aria-label="Choose platform" data-stretch="100" data-squash="3" style="width: 100%; margin-bottom: 8px;">
+                                <button type="button" class="rubber-segment__item active" data-value="PC" role="radio" aria-checked="true">PC</button>
+                                <button type="button" class="rubber-segment__item" data-value="PlayStation 5" role="radio" aria-checked="false">PlayStation 5</button>
+                                <button type="button" class="rubber-segment__item" data-value="Xbox Series X" role="radio" aria-checked="false">Xbox Series X</button>
+                                <button type="button" class="rubber-segment__item" data-value="Nintendo Switch" role="radio" aria-checked="false">Nintendo Switch</button>
+                            </div>
+                            <select id="platform" name="platform" class="form-control" required>
+                                <option value="PC" selected>PC</option>
+                                <option value="PlayStation 5">PlayStation 5</option>
+                                <option value="Xbox Series X">Xbox Series X</option>
+                                <option value="Nintendo Switch">Nintendo Switch</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="rental_days">Rental Duration (Days) *</label>
+                            <input type="number" id="rental_days" name="rental_days" class="form-control" min="1" max="90" value="7" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="priority">Priority / Delivery Type *</label>
+                            <div class="rubber-segment" id="rent-priority-segment" role="radiogroup" aria-label="Choose priority" data-stretch="100" data-squash="3" style="width: 100%; margin-bottom: 8px;">
+                                <button type="button" class="rubber-segment__item active" data-value="Standard" role="radio" aria-checked="true">Standard</button>
+                                <button type="button" class="rubber-segment__item" data-value="Express" role="radio" aria-checked="false">Express</button>
+                                <button type="button" class="rubber-segment__item" data-value="Pickup" role="radio" aria-checked="false">Store Pickup</button>
+                            </div>
+                            <select id="priority" name="priority" class="form-control" required>
+                                <option value="Standard" selected>Standard Delivery</option>
+                                <option value="Express">Express Same-Day Delivery</option>
+                                <option value="Pickup">Store Pickup</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--color-border-muted); padding-top: 16px; margin-top: 12px; display: flex; justify-content: flex-end; gap: 10px; align-items: center;">
+                        <a href="{{ url_for('index') }}" class="btn btn-default">Cancel</a>
+                        <button type="submit" class="specular-button" data-radius="14" data-line-color="#0969da" data-base-color="#525252" id="submit-rental-btn" style="border: none; cursor: pointer; padding: 6px 18px;">
+                            <span class="specular-button__label">Submit Rental Request &rarr;</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <span class="magic-bento__rim"></span>
+            <span class="magic-bento__border"></span>
+        </div>
+    </div>
+
+    <!-- Secondary Cell: Order Perks & Storage Bento Tile -->
+    <div class="magic-bento__cell">
+        <div class="magic-bento__card">
+            <span class="magic-bento__light"></span>
+            <div class="magic-bento__content" style="padding: 20px; justify-content: space-between;">
+                <div>
+                    <div class="magic-bento__header" style="margin-bottom: 12px;">
+                        <span class="magic-bento__icon">&#9889;</span>
+                        <span class="magic-bento__label">Rental Verification</span>
+                    </div>
+                    
+                    <div class="magic-bento__tile" style="padding: 12px; margin-bottom: 12px;">
+                        <div style="font-size: 11px; text-transform: uppercase; color: var(--color-fg-muted); letter-spacing: 0.5px;">Persistent Storage</div>
+                        <div style="font-weight: 600; font-size: 13px; color: var(--color-fg-default); margin-top: 2px;">SQLite + Docker Volume</div>
+                        <div style="font-size: 11px; color: var(--color-fg-muted); margin-top: 4px; font-family: var(--font-mono);">volume: game_rental_data</div>
+                    </div>
+
+                    <div class="magic-bento__well" style="padding: 12px; margin-bottom: 12px; font-size: 12px; line-height: 1.5;">
+                        <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--color-success-fg); margin-bottom: 4px;">
+                            <span>&#10003;</span> Automated Pytest Checked
+                        </div>
+                        <p style="margin: 0; color: var(--color-fg-muted); font-size: 11.5px;">
+                            Input fields and state lifecycle are validated automatically before deployment.
+                        </p>
+                    </div>
+
+                    <div class="magic-bento__tile" style="padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 12px; font-weight: 500;">Instant Dispatch</span>
+                        <span class="magic-bento__switch"></span>
+                    </div>
+                </div>
+
+                <div class="magic-bento__text" style="margin-top: 16px;">
+                    <h3 class="magic-bento__title">Order Guarantee</h3>
+                    <p class="magic-bento__description">A unique tracking ID will be created instantly for your live order.</p>
+                </div>
+            </div>
+            <span class="magic-bento__rim"></span>
+            <span class="magic-bento__border"></span>
+        </div>
+    </div>
+</div>
+{% endblock %}

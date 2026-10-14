@@ -1,0 +1,37 @@
+---
+- name: Deploy Game Rental Tracking System via Docker (Lab Compatibility)
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    container_name: "game-rental-ansible"
+    image_name: "game-rental-ci"
+    host_port: "5002"
+    container_port: "5000"
+    volume_name: "game_rental_data"
+    volume_mount: "/app/data"
+    target_state: "{{ container_state | default('started') }}"
+
+  tasks:
+    - name: Ensure persistent Docker Volume exists
+      community.docker.docker_volume:
+        name: "{{ volume_name }}"
+        state: present
+
+    - name: Deploy or update web application container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ image_name }}"
+        state: "{{ target_state }}"
+        restart_policy: unless-stopped
+        recreate: true
+        published_ports:
+          - "{{ host_port }}:{{ container_port }}"
+        volumes:
+          - "{{ volume_name }}:{{ volume_mount }}"
+      register: container_result
+
+    - name: Verify application container status
+      ansible.builtin.debug:
+        msg: "Container '{{ container_name }}' is running on port {{ host_port }}."

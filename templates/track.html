@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Track Rental &bull; Game Rental Tracking System{% endblock %}
+
+{% block content %}
+<div class="subhead animate-enter">
+    <div>
+        <h1 class="subhead-heading">Track Your Rental</h1>
+        <p class="subhead-description">Search by Request ID to inspect live fulfillment progress and lifecycle status.</p>
+    </div>
+</div>
+
+<div style="max-width: 820px; margin: 0 auto;">
+    <!-- Search Bento Card -->
+    <div class="magic-bento animate-enter delay-1" style="grid-template-columns: 1fr; margin-bottom: 20px;">
+        <div class="magic-bento__cell">
+            <div class="magic-bento__card" style="padding: 0;">
+                <span class="magic-bento__light"></span>
+                <div class="magic-bento__content" style="padding: 20px;">
+                    <div class="magic-bento__header" style="margin-bottom: 8px;">
+                        <span class="magic-bento__icon">&#128269;</span>
+                        <span class="magic-bento__label" style="font-weight: 600; color: var(--color-fg-default);">Lookup by Request ID</span>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 12px; color: var(--color-fg-muted); font-weight: 500;">Quick Presets:</span>
+                        <div class="rubber-segment" id="track-preset-segment" role="radiogroup" aria-label="Quick order presets" data-stretch="100" data-squash="3">
+                            <button type="button" class="rubber-segment__item {% if not rental_id or rental_id == 1 %}active{% endif %}" data-value="1" role="radio" aria-checked="true">Order #1</button>
+                            <button type="button" class="rubber-segment__item {% if rental_id == 2 %}active{% endif %}" data-value="2" role="radio" aria-checked="false">Order #2</button>
+                            <button type="button" class="rubber-segment__item {% if rental_id == 3 %}active{% endif %}" data-value="3" role="radio" aria-checked="false">Order #3</button>
+                        </div>
+                    </div>
+                    <form action="{{ url_for('track') }}" method="GET" style="display: flex; gap: 10px;" id="track-form">
+                        <input type="number" name="id" id="track-input-id" class="form-control" placeholder="Search by Rental ID (e.g. 1)" value="{{ rental_id if rental_id else '' }}" required style="font-size: 14px;">
+                        <button type="submit" class="specular-button" data-radius="12" data-line-color="#0969da" data-base-color="#525252" id="track-search-btn" style="border: none; cursor: pointer; padding: 6px 20px; white-space: nowrap;">
+                            <span class="specular-button__label">&#128269; Track Status</span>
+                        </button>
+                    </form>
+                </div>
+                <span class="magic-bento__rim"></span>
+                <span class="magic-bento__border"></span>
+            </div>
+        </div>
+    </div>
+
+    {% if not_found %}
+    <div class="magic-bento animate-enter delay-2" style="grid-template-columns: 1fr;">
+        <div class="magic-bento__cell">
+            <div class="magic-bento__card" style="text-align: center; padding: 36px 20px;">
+                <span class="magic-bento__light"></span>
+                <div class="magic-bento__content" style="align-items: center;">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-danger-fg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 8px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    <h3 class="magic-bento__title" style="font-size: 17px; margin-bottom: 4px;">No rental record found</h3>
+                    <p class="magic-bento__description" style="max-width: 440px;">No rental request found with ID #{{ rental_id }}. Verify the number in your receipt and try again.</p>
+                </div>
+                <span class="magic-bento__rim"></span>
+                <span class="magic-bento__border"></span>
+            </div>
+        </div>
+    </div>
+    {% elif rental %}
+    <div class="magic-bento animate-enter delay-2" style="grid-template-columns: 1fr;">
+        <div class="magic-bento__cell">
+            <div class="magic-bento__card">
+                <span class="magic-bento__light"></span>
+                <div class="magic-bento__content" style="padding: 24px;">
+                    <!-- Bento Header Bar -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--color-border-muted);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="mono-id" style="font-size: 18px; font-weight: 700;">#{{ rental.id }}</span>
+                            <h2 style="font-size: 18px; font-weight: 600; color: var(--color-fg-default); margin: 0;">{{ rental.game_title }}</h2>
+                            <span class="tag-pill">{{ rental.platform }}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge-state {{ rental.status|lower }}">
+                                <span class="badge-state-dot"></span>
+                                {{ rental.status }}
+                            </span>
+                            <button class="btn btn-default btn-sm" id="copy-btn" onclick="copyTrackingId('{{ rental.id }}')">
+                                Copy ID
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Animated vertical timeline -->
+                    <div style="margin: 16px 0;">
+                        <div class="timeline-track">
+                            <div class="timeline-item {% if rental.status in ['Pending', 'Approved', 'Dispatched', 'Completed'] %}completed{% endif %}">
+                                <div class="timeline-marker">1</div>
+                                <div class="timeline-title">Request Submitted</div>
+                                <div class="timeline-desc">Rental order received into the system with initial Pending status.</div>
+                            </div>
+
+                            <div class="timeline-item {% if rental.status in ['Approved', 'Dispatched', 'Completed'] %}completed{% elif rental.status == 'Pending' %}active{% endif %}">
+                                <div class="timeline-marker">2</div>
+                                <div class="timeline-title">Staff Approved</div>
+                                <div class="timeline-desc">Inventory verified, payment authorized, package queued for dispatch.</div>
+                            </div>
+
+                            <div class="timeline-item {% if rental.status in ['Dispatched', 'Completed'] %}completed{% elif rental.status == 'Approved' %}active{% endif %}">
+                                <div class="timeline-marker">3</div>
+                                <div class="timeline-title">Dispatched / In Transit</div>
+                                <div class="timeline-desc">Package handed over to courier or staged at counter for pickup.</div>
+                            </div>
+
+                            <div class="timeline-item {% if rental.status == 'Completed' %}completed{% elif rental.status == 'Dispatched' %}active{% endif %}">
+                                <div class="timeline-marker">4</div>
+                                <div class="timeline-title">Rental Completed</div>
+                                <div class="timeline-desc">Game returned in good condition. Transaction successfully closed.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Details Tile -->
+                    <div class="magic-bento__tile" style="padding: 16px;">
+                        <div style="font-size: 12px; font-weight: 600; color: var(--color-fg-muted); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Order Metadata</div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; font-size: 13px;">
+                            <div>
+                                <span style="color: var(--color-fg-muted); display: block; font-size: 12px;">Customer</span>
+                                <strong>{{ rental.customer_name }}</strong>
+                            </div>
+                            <div>
+                                <span style="color: var(--color-fg-muted); display: block; font-size: 12px;">Contact</span>
+                                <code>{{ rental.contact }}</code>
+                            </div>
+                            <div>
+                                <span style="color: var(--color-fg-muted); display: block; font-size: 12px;">Duration</span>
+                                <strong>{{ rental.rental_days }} Days</strong>
+                            </div>
+                            <div>
+                                <span style="color: var(--color-fg-muted); display: block; font-size: 12px;">Priority</span>
+                                <span class="tag-pill">{{ rental.priority }}</span>
+                            </div>
+                            <div>
+                                <span style="color: var(--color-fg-muted); display: block; font-size: 12px;">Created Timestamp</span>
+                                <span style="font-family: var(--font-mono); font-size: 11px;">{{ rental.created_at }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <span class="magic-bento__rim"></span>
+                <span class="magic-bento__border"></span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

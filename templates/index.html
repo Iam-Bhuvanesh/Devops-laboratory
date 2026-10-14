@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Game Rental Tracking System &bull; Overview{% endblock %}
+
+{% block content %}
+<!-- Clean Subhead (GitHub Docs Aesthetic) -->
+<div class="subhead animate-enter">
+    <div>
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; color: var(--color-accent-fg); margin-bottom: 4px;">
+            DevOps Laboratory Project
+        </div>
+        <h1 class="subhead-heading">Game Rental Tracking System</h1>
+        <p class="subhead-description">
+            Interactive web application demonstrating persistent containerized storage, automated Pytest suites, Jenkins declarative CI/CD, and Ansible orchestration.
+        </p>
+    </div>
+    <div class="rubber-segment" id="subhead-actions-segment" data-stretch="85" data-glide="75" style="--rs-h: 36px; --rs-radius: 10px;">
+        <a href="{{ url_for('rent') }}" class="rubber-segment__item active" aria-checked="true" id="btn-hero-rent">
+            <span>Rent a Game &rarr;</span>
+        </a>
+        <a href="{{ url_for('track') }}" class="rubber-segment__item" aria-checked="false" id="btn-hero-track">
+            <span>&#128269; Track Rental</span>
+        </a>
+        <a href="{{ url_for('admin') }}" class="rubber-segment__item" aria-checked="false" id="btn-hero-admin">
+            <span>&#9881; Admin Portal</span>
+        </a>
+    </div>
+</div>
+
+
+
+<!-- Available Catalog Section with RubberSegment Platform Filter & MagicBento Grid -->
+<div class="Box animate-enter delay-2 has-spotlight">
+    <div class="Box-header">
+        <h2 class="Box-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="3"></rect>
+                <line x1="6" y1="12" x2="10" y2="12"></line>
+                <line x1="8" y1="10" x2="8" y2="14"></line>
+                <circle cx="15.5" cy="10.5" r=".7" fill="currentColor"></circle>
+                <circle cx="17.5" cy="13.5" r=".7" fill="currentColor"></circle>
+            </svg>
+            Available Games Catalog
+        </h2>
+        
+        <!-- RubberSegment Interactive Filter Control -->
+        <div class="rubber-segment" id="catalog-platform-segment" role="radiogroup" aria-label="Filter catalog platforms">
+            <button type="button" class="rubber-segment__item active" data-value="All Platforms" role="radio" aria-checked="true">
+                All Platforms
+            </button>
+            <button type="button" class="rubber-segment__item" data-value="PlayStation 5" role="radio" aria-checked="false">
+                PlayStation 5
+            </button>
+            <button type="button" class="rubber-segment__item" data-value="Xbox Series X" role="radio" aria-checked="false">
+                Xbox Series X
+            </button>
+            <button type="button" class="rubber-segment__item" data-value="Nintendo Switch" role="radio" aria-checked="false">
+                Nintendo Switch
+            </button>
+            <button type="button" class="rubber-segment__item" data-value="PC" role="radio" aria-checked="false">
+                PC
+            </button>
+        </div>
+    </div>
+    <div class="Box-body">
+        <!-- MagicBento Grid for Games -->
+        <div class="magic-bento" style="grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; margin-bottom: 0;">
+            {% for game in games %}
+            <div class="magic-bento__cell item-card" data-platform="{{ game.platform }}" style="padding: 0; background: transparent; border: none;">
+                <div class="magic-bento__card" style="padding: 0;">
+                    <span class="magic-bento__light"></span>
+                    <div class="magic-bento__content" style="padding: 18px; justify-content: space-between;">
+                        <div>
+                            <div class="magic-bento__header" style="justify-content: space-between; margin-bottom: 6px;">
+                                <span class="tag-pill">{{ game.platform }}</span>
+                                <span style="font-family: var(--font-mono); font-weight: 600; color: var(--color-accent-fg); font-size: 13px;">&#8377;{{ "%.2f"|format(game.daily_rate) }}/day</span>
+                            </div>
+                            <div class="magic-bento__text" style="margin-top: 8px;">
+                                <h3 class="magic-bento__title" style="font-size: 16px;">
+                                    <a href="{{ url_for('rent', game=game.title) }}" style="color: inherit; text-decoration: none;">
+                                        {{ game.title }}
+                                    </a>
+                                </h3>
+                                <p class="magic-bento__description">{{ game.genre }}</p>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--color-border-muted); margin-top: 12px;">
+                            <span style="font-size: 12px; color: var(--color-fg-muted); display: inline-flex; align-items: center; gap: 4px;">
+                                <span class="badge-state-dot" style="background: var(--color-success-fg);"></span> Ready in stock
+                            </span>
+                            <a href="{{ url_for('rent', game=game.title) }}" class="specular-button" data-radius="12" data-line-color="#0969da" data-base-color="#525252" style="padding: 5px 14px; font-size: 12px;">
+                                <span class="specular-button__label">Rent &rarr;</span>
+                            </a>
+                        </div>
+                    </div>
+                    <span class="magic-bento__rim"></span>
+                    <span class="magic-bento__border"></span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- DevOps Pipeline Architecture MagicBento Showcase -->
+<div class="magic-bento animate-enter delay-3" style="grid-template-columns: 2fr 1fr; gap: 14px;">
+    <!-- Architecture Flow Card -->
+    <div class="magic-bento__cell">
+        <div class="magic-bento__card">
+            <span class="magic-bento__light"></span>
+            <div class="magic-bento__content">
+                <div class="magic-bento__header">
+                    <span class="magic-bento__icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                    </span>
+                    <span class="magic-bento__label">CI/CD Pipeline Architecture &bull; Jenkins & Ansible</span>
+                    <span class="tag-pill" style="margin-left: auto;">game-deploy.yml</span>
+                </div>
+                <div class="magic-bento__visual" style="margin: 8px 0;">
+                    <div class="magic-bento__flow">
+                        <div class="magic-bento__flow-trigger magic-bento__tile">
+                            <span class="magic-bento__flow-glyph">&#9881;</span>
+                            <div class="magic-bento__flow-copy">
+                                <span class="magic-bento__flow-name">Jenkinsfile Declarative Pipeline</span>
+                                <span class="magic-bento__flow-meta magic-bento__flow-hash">commit: #a1c9f3e &bull; Docker Volume: game_rental_data</span>
+                            </div>
+                        </div>
+                        <ol class="magic-bento__steps magic-bento__well">
+                            <span class="magic-bento__rail"><span class="magic-bento__rail-fill"></span></span>
+                            <li class="magic-bento__step" style="--i: 0;">
+                                <span class="magic-bento__status"><span class="magic-bento__done">&#10003;</span></span>
+                                Stage 1: Build Image (game-rental-ci)
+                                <span class="magic-bento__step-time">4.2s</span>
+                            </li>
+                            <li class="magic-bento__step" style="--i: 1;">
+                                <span class="magic-bento__status"><span class="magic-bento__done">&#10003;</span></span>
+                                Stage 2: Automated Pytest Suite
+                                <span class="magic-bento__step-time">0.7s</span>
+                            </li>
+                            <li class="magic-bento__step" style="--i: 2;">
+                                <span class="magic-bento__status"><span class="magic-bento__done">&#10003;</span></span>
+                                Stage 3: Ansible Deployment Playbook
+                                <span class="magic-bento__step-time">2.8s</span>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="magic-bento__text">
+                    <h3 class="magic-bento__title">Automated DevOps Delivery</h3>
+                    <p class="magic-bento__description">Continuous integration running automated testing with persistent Docker volumes.</p>
+                </div>
+            </div>
+            <span class="magic-bento__rim"></span>
+            <span class="magic-bento__border"></span>
+        </div>
+    </div>
+
+    <!-- Hub Integration Card -->
+    <div class="magic-bento__cell">
+        <div class="magic-bento__card">
+            <span class="magic-bento__light"></span>
+            <div class="magic-bento__content">
+                <div class="magic-bento__header">
+                    <span class="magic-bento__icon">&#128279;</span>
+                    <span class="magic-bento__label">Toolchain Integrations</span>
+                </div>
+                <div class="magic-bento__visual" style="margin: 6px 0;">
+                    <div class="magic-bento__hub">
+                        <svg class="magic-bento__hub-links" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <line x1="20" y1="25" x2="50" y2="50"></line>
+                            <line x1="80" y1="25" x2="50" y2="50"></line>
+                            <line x1="20" y1="75" x2="50" y2="50"></line>
+                            <line x1="80" y1="75" x2="50" y2="50"></line>
+                        </svg>
+                        <span class="magic-bento__packet" style="--x: 20%; --y: 25%; --i: 0;"></span>
+                        <span class="magic-bento__packet" style="--x: 80%; --y: 25%; --i: 1;"></span>
+                        <span class="magic-bento__packet" style="--x: 20%; --y: 75%; --i: 2;"></span>
+                        <span class="magic-bento__packet" style="--x: 80%; --y: 75%; --i: 3;"></span>
+                        <span class="magic-bento__hub-node magic-bento__tile" style="--x: 20%; --y: 25%; --s: 28px;">Git</span>
+                        <span class="magic-bento__hub-node magic-bento__tile" style="--x: 80%; --y: 25%; --s: 28px;">Pytest</span>
+                        <span class="magic-bento__hub-node magic-bento__tile" style="--x: 20%; --y: 75%; --s: 28px;">Docker</span>
+                        <span class="magic-bento__hub-node magic-bento__tile" style="--x: 80%; --y: 75%; --s: 28px;">Ansible</span>
+                        <span class="magic-bento__hub-node magic-bento__tile" style="--x: 50%; --y: 50%; --s: 34px; color: var(--color-accent-fg);">&#9889;</span>
+                    </div>
+                </div>
+                <div class="magic-bento__text">
+                    <h3 class="magic-bento__title">Connected Workflow</h3>
+                    <p class="magic-bento__description">Docker &bull; Jenkins &bull; Ansible</p>
+                </div>
+            </div>
+            <span class="magic-bento__rim"></span>
+            <span class="magic-bento__border"></span>
+        </div>
+    </div>
+</div>
+{% endblock %}

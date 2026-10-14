@@ -1,0 +1,8 @@
+game_rental.db
+data/game_rental.db
+waste_collection.db
+data/waste_collection.db
+__pycache__/
+*.pyc
+.venv/
+.env

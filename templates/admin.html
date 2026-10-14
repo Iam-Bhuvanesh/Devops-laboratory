@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard &bull; Game Rental Tracking System{% endblock %}
+
+{% block content %}
+<div class="subhead animate-enter">
+    <div>
+        <h1 class="subhead-heading">Admin Dashboard</h1>
+        <p class="subhead-description">Operations portal for managing customer rental workflows and updating fulfillment states.</p>
+    </div>
+    <div style="display: flex; gap: 8px;">
+        <span class="tag-pill">SQLite / Docker Volume</span>
+    </div>
+</div>
+
+<!-- Metrics Bento Row (Interactive MagicBento with Spotlight & Border Glow) -->
+<div class="magic-bento animate-enter delay-1" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-bottom: 24px;">
+    <!-- Cell 1: Total Requests -->
+    <div class="magic-bento__cell">
+        <div class="magic-bento__card" style="min-height: 160px;">
+            <span class="magic-bento__light"></span>
+            <div class="magic-bento__content">
+                <div class="magic-bento__header">
+                    <span class="magic-bento__icon">&#128202;</span>
+                    <span class="magic-bento__label">Total Requests</span>
+                </div>
+                <div class="magic-bento__visual">
+                    <div class="magic-bento__chart">
+                        <div class="magic-bento__figure">
+                            <span class="magic-bento__figure-value">{{ summary.total }}</span>
+                            <span class="magic-bento__figure-note">+14% month</span>
+                        </div>
+                        <div class="magic-bento__plot"></div>
+                    </div>
+                </div>
+                <div class="magic-bento__text">
+                    <h3 class="magic-bento__title">Total Requests</h3>
+                    <p class="magic-bento__description">Aggregate operations ledger</p>
+                </div>
+            </div>
+            <span class="magic-bento__rim"></span>
+            <span class="magic-bento__border"></span>
+        </div>
+    </div>
+
+    <!-- Cell 2: Pending -->
+    <div class="magic-bento__cell">
+        <div class="magic-bento__card" style="min-height: 160px;">
+            <span class="magic-bento__light"></span>
+            <div class="magic-bento__content">
+                <div class="magic-bento__header">
+                    <span class="magic-bento__icon" style="color: var(--color-attention-fg);">&#9203;</span>
+                    <span class="magic-bento__label" style="color: var(--color-attention-fg);">Pending</span>
+                </div>
+                <div class="magic-bento__visual">
+                    <div class="magic-bento__bars">
+                        <div class="magic-bento__figure">
+                            <span class="magic-bento__figure-value" style="color: var(--color-attention-fg);">{{ summary.pending }}</span>
+                            <span class="magic-bento__figure-note" style="color: var(--color-fg-muted);">Unreviewed</span>
+                        </div>
+                        <div class="magic-bento__bars-plot">
+                            <span class="magic-bento__bar" style="--h: 0.35;"></span>
+                            <span class="magic-bento__bar" style="--h: 0.50;"></span>
+                            <span class="magic-bento__bar" data-peak style="--h: 0.85; background: var(--color-attention-fg);"></span>
+                            <span class="magic-bento__bar" style="--h: 0.60;"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="magic-bento__text">
+                    <h3 class="magic-bento__title">Review Queue</h3>
+                    <p class="magic-bento__description">Awaiting staff dispatch</p>
+                </div>
+            </div>
+            <span class="magic-bento__rim"></span>
+            <span class="magic-bento__border"></span>
+        </div>
+    </div>
+
+    <!-- Cell 3: Active / Dispatched -->
+    <div class="magic-bento__cell">
+        <div class="magic-bento__card" style="min-height: 160px;">
+            <span class="magic-bento__light"></span>
+            <div class="magic-bento__content">
+                <div class="magic-bento__header">
+                    <span class="magic-bento__icon" style="color: var(--color-done-fg);">&#128666;</span>
+                    <span class="magic-bento__label" style="color: var(--color-done-fg);">Active / Dispatched</span>
+                </div>
+                <div class="magic-bento__visual">
+                    <div class="magic-bento__figure" style="margin-bottom: 6px;">
+                        <span class="magic-bento__figure-value" style="color: var(--color-done-fg);">{{ summary.active }}</span>
+                        <span class="magic-bento__figure-note" style="color: var(--color-done-fg);">In Transit</span>
+                    </div>
+                    <div class="magic-bento__well" style="padding: 6px 10px; font-size: 11px; display: flex; align-items: center; gap: 8px;">
+                        <span class="badge-state-dot" style="background: var(--color-done-fg);"></span>
+                        <span>Carrier Dispatched</span>
+                    </div>
+                </div>
+                <div class="magic-bento__text">
+                    <h3 class="magic-bento__title">Dispatched Orders</h3>
+                    <p class="magic-bento__description">Live transit across platforms</p>
+                </div>
+            </div>
+            <span class="magic-bento__rim"></span>
+            <span class="magic-bento__border"></span>
+        </div>
+    </div>
+
+    <!-- Cell 4: Completed -->
+    <div class="magic-bento__cell">
+        <div class="magic-bento__card" style="min-height: 160px;">
+            <span class="magic-bento__light"></span>
+            <div class="magic-bento__content">
+                <div class="magic-bento__header">
+                    <span class="magic-bento__icon" style="color: var(--color-success-fg);">&#9989;</span>
+                    <span class="magic-bento__label" style="color: var(--color-success-fg);">Completed</span>
+                </div>
+                <div class="magic-bento__visual">
+                    <div class="magic-bento__figure" style="margin-bottom: 6px;">
+                        <span class="magic-bento__figure-value" style="color: var(--color-success-fg);">{{ summary.completed }}</span>
+                        <span class="magic-bento__figure-note" style="color: var(--color-success-fg);">Audited</span>
+                    </div>
+                    <div class="magic-bento__tile" style="padding: 4px 8px; font-size: 11px; display: flex; align-items: center; justify-content: space-between;">
+                        <span>Lock Status</span>
+                        <span class="magic-bento__switch" style="width: 22px; height: 13px;"></span>
+                    </div>
+                </div>
+                <div class="magic-bento__text">
+                    <h3 class="magic-bento__title">Closed Transactions</h3>
+                    <p class="magic-bento__description">Returned and archived</p>
+                </div>
+            </div>
+            <span class="magic-bento__rim"></span>
+            <span class="magic-bento__border"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Requests Table MagicBento Box with RubberSegment Status Filter -->
+<div class="magic-bento animate-enter delay-2" style="grid-template-columns: 1fr;">
+    <div class="magic-bento__cell">
+        <div class="magic-bento__card" style="padding: 0;">
+            <span class="magic-bento__light"></span>
+            <div class="magic-bento__content" style="padding: 0; gap: 0;">
+                <div class="Box-header" style="background: transparent; border-bottom: 1px solid var(--color-border-default); padding: 16px 20px;">
+                    <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                        <!-- RubberSegment (Elastic Spring-Physics Control) -->
+                        <div class="rubber-segment" id="admin-status-segment" role="radiogroup" aria-label="Filter status">
+                            <a href="{{ url_for('admin', filter='all') }}" class="rubber-segment__item {% if summary.current_filter == 'all' %}active{% endif %}" data-value="all" role="radio" aria-checked="{% if summary.current_filter == 'all' %}true{% else %}false{% endif %}">
+                                All ({{ summary.total }})
+                            </a>
+                            <a href="{{ url_for('admin', filter='Pending') }}" class="rubber-segment__item {% if summary.current_filter == 'Pending' %}active{% endif %}" data-value="Pending" role="radio" aria-checked="{% if summary.current_filter == 'Pending' %}true{% else %}false{% endif %}">
+                                Pending ({{ summary.pending }})
+                            </a>
+                            <a href="{{ url_for('admin', filter='Approved') }}" class="rubber-segment__item {% if summary.current_filter == 'Approved' %}active{% endif %}" data-value="Approved" role="radio" aria-checked="{% if summary.current_filter == 'Approved' %}true{% else %}false{% endif %}">
+                                Approved
+                            </a>
+                            <a href="{{ url_for('admin', filter='Dispatched') }}" class="rubber-segment__item {% if summary.current_filter == 'Dispatched' %}active{% endif %}" data-value="Dispatched" role="radio" aria-checked="{% if summary.current_filter == 'Dispatched' %}true{% else %}false{% endif %}">
+                                Dispatched
+                            </a>
+                            <a href="{{ url_for('admin', filter='Completed') }}" class="rubber-segment__item {% if summary.current_filter == 'Completed' %}active{% endif %}" data-value="Completed" role="radio" aria-checked="{% if summary.current_filter == 'Completed' %}true{% else %}false{% endif %}">
+                                Completed ({{ summary.completed }})
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <input type="text" id="admin-search" class="form-control" placeholder="Filter requests..." style="max-width: 240px; padding: 4px 10px; font-size: 12px;">
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="rentals-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">ID</th>
+                                <th>Game Title</th>
+                                <th>Platform</th>
+                                <th>Customer</th>
+                                <th>Duration</th>
+                                <th>Priority</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Update Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if rentals %}
+                                {% for r in rentals %}
+                                <tr>
+                                    <td><span class="mono-id">#{{ r.id }}</span></td>
+                                    <td><strong>{{ r.game_title }}</strong></td>
+                                    <td><span class="tag-pill">{{ r.platform }}</span></td>
+                                    <td>
+                                        <div>{{ r.customer_name }}</div>
+                                        <div style="color: var(--color-fg-muted); font-size: 11px;">{{ r.contact }}</div>
+                                    </td>
+                                    <td>{{ r.rental_days }}d</td>
+                                    <td><span class="tag-pill">{{ r.priority }}</span></td>
+                                    <td style="font-size: 11px; font-family: var(--font-mono); color: var(--color-fg-muted);">{{ r.created_at }}</td>
+                                    <td>
+                                        <span class="badge-state {{ r.status|lower }}">
+                                            <span class="badge-state-dot"></span>
+                                            {{ r.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <form action="{{ url_for('update_status') }}" method="POST" style="display: inline-flex; gap: 6px; align-items: center;">
+                                            <input type="hidden" name="rental_id" value="{{ r.id }}">
+                                            <select name="status" class="select-sm" aria-label="Status">
+                                                <option value="Pending" {% if r.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                                <option value="Approved" {% if r.status == 'Approved' %}selected{% endif %}>Approved</option>
+                                                <option value="Dispatched" {% if r.status == 'Dispatched' %}selected{% endif %}>Dispatched</option>
+                                                <option value="Completed" {% if r.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-default btn-sm">Save</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="9" style="text-align: center; padding: 36px; color: var(--color-fg-muted);">
+                                        No rental records found matching this filter.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <span class="magic-bento__rim"></span>
+            <span class="magic-bento__border"></span>
+        </div>
+    </div>
+</div>
+{% endblock %}

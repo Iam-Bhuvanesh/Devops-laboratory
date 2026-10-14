@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Game Rental Tracking System - College DevOps CI/CD Lab Demonstration">
+    <title>{% block title %}Game Rental Tracking System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Clean Minimalist Header with GitHub Docs Search -->
+    <header class="app-header">
+        <div class="app-header-inner">
+            <div class="app-brand-wrap">
+                <a href="{{ url_for('index') }}" class="app-brand-logo" title="Game Rental Tracking System">
+                    <span class="brand-icon-box">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="6" width="20" height="12" rx="3"></rect>
+                            <line x1="6" y1="12" x2="10" y2="12"></line>
+                            <line x1="8" y1="10" x2="8" y2="14"></line>
+                            <circle cx="15.5" cy="10.5" r=".7" fill="currentColor"></circle>
+                            <circle cx="17.5" cy="13.5" r=".7" fill="currentColor"></circle>
+                        </svg>
+                    </span>
+                    <span>Game Rental Tracking System</span>
+                </a>
+            </div>
+
+            <!-- GitHub Docs Style Quick Search -->
+            <div class="header-search-wrap">
+                <span class="search-icon">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </span>
+                <input type="text" id="header-search" class="header-search-input" placeholder="Search or Jump to..." aria-label="Search">
+                <span class="search-shortcut-badge">/</span>
+            </div>
+
+            <div class="app-header-actions">
+                <a href="{{ url_for('rent') }}" class="specular-button" data-radius="12" data-line-color="#0969da" data-base-color="#d0d7de" data-intensity="1.2" style="padding: 6px 16px; font-size: 13px;">
+                    <span class="specular-button__label">
+                        <svg height="14" viewBox="0 0 16 16" width="14" fill="currentColor"><path d="M7.75 2a.75.75 0 0 1 .75.75V7h4.25a.75.75 0 0 1 0 1.5H8.5v4.25a.75.75 0 0 1-1.5 0V8.5H2.75a.75.75 0 0 1 0-1.5H7V2.75A.75.75 0 0 1 7.75 2Z"></path></svg>
+                        New Rental
+                    </span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs (RubberSegment Elastic Control) -->
+    <nav class="app-nav-tabs">
+        <div class="app-nav-inner">
+            <div class="rubber-segment" id="main-nav-segment" data-stretch="85" data-glide="75" style="--rs-h: 38px; --rs-radius: 10px; --rs-pad: 16px;">
+                <a href="{{ url_for('index') }}" class="rubber-segment__item {% if request.endpoint == 'index' %}active{% endif %}" aria-checked="{% if request.endpoint == 'index' %}true{% else %}false{% endif %}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>Overview</span>
+                </a>
+                <a href="{{ url_for('rent') }}" class="rubber-segment__item {% if request.endpoint == 'rent' %}active{% endif %}" aria-checked="{% if request.endpoint == 'rent' %}true{% else %}false{% endif %}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    <span>Rent a Game</span>
+                </a>
+                <a href="{{ url_for('track') }}" class="rubber-segment__item {% if request.endpoint == 'track' %}active{% endif %}" aria-checked="{% if request.endpoint == 'track' %}true{% else %}false{% endif %}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>Track Status</span>
+                </a>
+                <a href="{{ url_for('admin') }}" class="rubber-segment__item {% if request.endpoint == 'admin' %}active{% endif %}" aria-checked="{% if request.endpoint == 'admin' %}true{% else %}false{% endif %}">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                    <span>Admin Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area with entrance animation -->
+    <main class="container animate-enter">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <span>{{ message }}</span>
+                            <button class="alert-close" aria-label="Dismiss">&times;</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Proper Professional Footer (GitHub Docs / DevOps Architecture Portal) -->
+    <footer class="app-footer">
+        <div class="app-footer-container">
+            <div class="app-footer-grid">
+                <!-- Brand & Mission Column -->
+                <div class="app-footer-brand">
+                    <div class="footer-brand-header">
+                        <span class="footer-brand-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                                <path d="M6 12h4m-2-2v4"></path>
+                                <circle cx="17" cy="10" r="1"></circle>
+                                <circle cx="15" cy="13" r="1"></circle>
+                            </svg>
+                        </span>
+                        <span class="footer-brand-title">Game Rental Tracking System</span>
+                    </div>
+                    <p class="footer-brand-desc">
+                        A production-grade DevOps Laboratory demonstration platform illustrating automated container orchestration, persistent Docker volume storage, declarative CI/CD pipelines, and rigorous Pytest verification.
+                    </p>
+                    <div class="footer-status-badge">
+                        <span class="status-pulse-dot"></span>
+                        <span class="status-badge-text">All Systems Operational &bull; Docker Volume Active</span>
+                    </div>
+                    <div class="footer-environment-pill">
+                        <code>env: production-docker</code> &bull; <code>build: v2.4.1</code> &bull; <code>db: sqlite3-acid</code>
+                    </div>
+                </div>
+
+                <!-- Column 2: Navigation & Portal -->
+                <div class="app-footer-col">
+                    <h4 class="footer-col-title">Portal Navigation</h4>
+                    <ul class="footer-link-list">
+                        <li><a href="{{ url_for('index') }}" class="footer-link">Overview & Metrics</a></li>
+                        <li><a href="{{ url_for('rent') }}" class="footer-link">Rent a Game</a></li>
+                        <li><a href="{{ url_for('track') }}" class="footer-link">Track Rental Status</a></li>
+                        <li><a href="{{ url_for('admin') }}" class="footer-link">Admin Dashboard</a></li>
+                        <li><a href="{{ url_for('health_check') }}" class="footer-link" target="_blank">Health Check API <code>/api/health</code></a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: DevOps Pipeline -->
+                <div class="app-footer-col">
+                    <h4 class="footer-col-title">DevOps Toolchain</h4>
+                    <ul class="footer-link-list">
+                        <li><span class="footer-tech-item"><span class="bullet-dot"></span>Docker Containerization</span></li>
+                        <li><span class="footer-tech-item"><span class="bullet-dot"></span>Docker Volume <code>game_rental_data</code></span></li>
+                        <li><span class="footer-tech-item"><span class="bullet-dot"></span>Jenkins Declarative CI/CD</span></li>
+                        <li><span class="footer-tech-item"><span class="bullet-dot"></span>Automated Pytest Suite (9 Tests)</span></li>
+                        <li><span class="footer-tech-item"><span class="bullet-dot"></span>Ansible Playbook Orchestration</span></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Architecture & Integrity -->
+                <div class="app-footer-col">
+                    <h4 class="footer-col-title">Architecture & Specs</h4>
+                    <ul class="footer-link-list">
+                        <li><span class="footer-tech-item"><span class="bullet-dot"></span>Python 3.11 &bull; Flask 3.0</span></li>
+                        <li><span class="footer-tech-item"><span class="bullet-dot"></span>SQLite3 ACID Transactions</span></li>
+                        <li><span class="footer-tech-item"><span class="bullet-dot"></span>RubberSegment Spring Physics</span></li>
+                        <li><span class="footer-tech-item"><span class="bullet-dot"></span>MagicBento Micro-Interactions</span></li>
+                        <li><span class="footer-tech-item"><span class="bullet-dot"></span>GitHub Docs Design Aesthetic</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Footer Bottom Bar -->
+            <div class="app-footer-bottom">
+                <div class="footer-copyright">
+                    &copy; 2026 Game Rental Tracking System &bull; DevOps Laboratory Project. All rights reserved.
+                </div>
+                <div class="footer-tags">
+                    <span class="tag-pill">Flask 3.0</span>
+                    <span class="tag-pill">SQLite</span>
+                    <span class="tag-pill">Docker</span>
+                    <span class="tag-pill">Docker Volume</span>
+                    <span class="tag-pill">Pytest 9.1</span>
+                    <span class="tag-pill">Jenkins</span>
+                    <span class="tag-pill">Ansible</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='effects.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
