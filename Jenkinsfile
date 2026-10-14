@@ -15,7 +15,7 @@ pipeline {
                 echo "STAGE 1: Building Docker Image"
                 echo "Image: ${IMAGE_NAME}"
                 echo "=========================================="
-                bat "docker build -t ${IMAGE_NAME} ."
+                sh "docker build -t ${IMAGE_NAME} ."
             }
         }
 
@@ -24,7 +24,7 @@ pipeline {
                 echo "=========================================="
                 echo "STAGE 2: Running Automated Pytest in Container"
                 echo "=========================================="
-                bat "docker run --rm ${IMAGE_NAME} python -m pytest test_app.py"
+                sh "docker run --rm ${IMAGE_NAME} python -m pytest test_app.py"
             }
         }
 
@@ -34,7 +34,12 @@ pipeline {
                 echo "STAGE 3: Deploying Container via Ansible"
                 echo "Executing Playbook: ${PLAYBOOK_PATH} in ${ANSIBLE_CONTAINER}"
                 echo "=========================================="
-                bat "docker exec ${ANSIBLE_CONTAINER} ansible-playbook -i ${INVENTORY_PATH} ${PLAYBOOK_PATH}"
+                sh """
+                docker exec ${ANSIBLE_CONTAINER} \
+                ansible-playbook \
+                -i ${INVENTORY_PATH} \
+                ${PLAYBOOK_PATH}
+                """
             }
         }
     }
