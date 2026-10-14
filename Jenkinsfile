@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'game-rental-ci'
+        DOCKER_BIN = 'C:\\Users\\Admin\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe'
     }
 
     stages {
@@ -12,7 +13,7 @@ pipeline {
                 echo "STAGE 1: Building Docker Image"
                 echo "Image: ${IMAGE_NAME}"
                 echo "=========================================="
-                bat "docker build -t ${IMAGE_NAME} ."
+                bat "\"${DOCKER_BIN}\" build -t ${IMAGE_NAME} ."
             }
         }
 
@@ -21,7 +22,7 @@ pipeline {
                 echo "=========================================="
                 echo "STAGE 2: Running Automated Pytest in Container"
                 echo "=========================================="
-                bat "docker run --rm ${IMAGE_NAME} python -m pytest test_app.py"
+                bat "\"${DOCKER_BIN}\" run --rm ${IMAGE_NAME} python -m pytest test_app.py"
             }
         }
 
